@@ -180,8 +180,8 @@ const Vacancy = () => {
                             {new Date() > new Date(vacancy.doubleFeeLastDate)
                               ? 'Date Exceeded'
                               : new Date() > new Date(vacancy.lastDate)
-                              ? `Rs. ${vacancy.doubleFee}`
-                              : `Rs. ${vacancy.regularFee}`}
+                              ? `$ ${vacancy.doubleFee}`
+                              : `$ ${vacancy.regularFee}`}
                           </p>
                         </div>
                       </div>
@@ -289,8 +289,8 @@ const Vacancy = () => {
                     {new Date() > new Date(selectedVacancy.doubleFeeLastDate)
                       ? 'Date Exceeded'
                       : new Date() > new Date(selectedVacancy.lastDate)
-                      ? `Rs. ${selectedVacancy.doubleFee}`
-                      : `Rs. ${selectedVacancy.regularFee}`}
+                      ? `$ ${selectedVacancy.doubleFee}`
+                      : `$ ${selectedVacancy.regularFee}`}
                   </p>
                 </div>
 

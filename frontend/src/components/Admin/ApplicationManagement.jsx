@@ -242,7 +242,7 @@ const handleStatusUpdate = async (applicationId, status, rejectionReason = '') =
                     Quota
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Fee Paid
+                    Fee Paid in $
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Status
@@ -281,7 +281,7 @@ const handleStatusUpdate = async (applicationId, status, rejectionReason = '') =
                       </td>
 
                       <td className="px-6 py-4 text-sm text-gray-800">
-                        Rs. {app.feePaid}
+                         {app.feePaid}
                       </td>
 
                       <td className="px-6 py-4">

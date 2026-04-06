@@ -306,7 +306,7 @@ const Dashboard = () => {
 
                       <div className="text-right shrink-0">
                         <p className="text-sm text-gray-500">Fee Paid</p>
-                        <p className="font-semibold text-gray-800">Rs. {app.feePaid}</p>
+                        <p className="font-semibold text-gray-800"> $ {app.feePaid}</p>
                       </div>
                     </div>
                   </div>

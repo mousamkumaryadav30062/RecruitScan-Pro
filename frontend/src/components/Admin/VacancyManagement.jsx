@@ -359,9 +359,9 @@ const VacancyManagement = () => {
                       {new Date(v.doubleFeeLastDate).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-5 text-sm text-gray-700">
-                      <span className="font-medium">Rs. {v.regularFee}</span>
+                      <span className="font-medium">$ {v.regularFee}</span>
                       <span className="text-gray-400 mx-2">/</span>
-                      <span className="font-medium">Rs. {v.doubleFee}</span>
+                      <span className="font-medium">$ {v.doubleFee}</span>
                     </td>
                     <td className="px-6 py-5 text-center">
                       <div className="flex justify-center gap-2">

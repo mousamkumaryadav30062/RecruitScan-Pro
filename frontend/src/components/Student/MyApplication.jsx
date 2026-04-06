@@ -148,7 +148,7 @@ const MyApplication = () => {
 
                       <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                         <p className="text-sm text-gray-500 mb-1">Fee Paid</p>
-                        <p className="font-semibold text-gray-800">Rs. {app.feePaid}</p>
+                        <p className="font-semibold text-gray-800"> $ {app.feePaid}</p>
                       </div>
 
                       <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
