@@ -93,12 +93,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  citizenship: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  nid: {
+  niNumber: {
     type: String,
     required: true,
     unique: true
@@ -120,18 +115,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  grandFatherName: {
-    type: String,
-    default: ''
-  },
-  citizenshipIssuePlace: {
-    type: String,
-    default: ''
-  },
-  citizenshipIssueDateAD: {
-    type: Date
-  },
-  citizenshipIssueDateBS: {
+  spouseName: {
     type: String,
     default: ''
   },
@@ -143,11 +127,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  citizenshipFront: {
+  idDocumentFront: {
     type: String,
     default: ''
   },
-  citizenshipBack: {
+  idDocumentBack: {
     type: String,
     default: ''
   },

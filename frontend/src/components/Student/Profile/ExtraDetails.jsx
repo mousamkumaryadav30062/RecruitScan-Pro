@@ -40,7 +40,7 @@ const ExtraDetails = ({ onNext, onPrevious }) => {
     setLoading(true);
     try {
       await api.put('/user/profile/extra', formData);
-      toast.success('Extra details saved!');
+      toast.success('Additional details saved!');
       onNext();
     } catch (error) {
       toast.error('Failed to save details');
@@ -52,9 +52,10 @@ const ExtraDetails = ({ onNext, onPrevious }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quota
+            Application Category
           </label>
           <select
             name="quota"
@@ -62,28 +63,40 @@ const ExtraDetails = ({ onNext, onPrevious }) => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Select Quota</option>
+            <option value="">Select category</option>
             <option value="open">Open</option>
             <option value="women">Women</option>
-            <option value="disabled">Disabled</option>
-            <option value="backward">Backward Region</option>
+            <option value="disabled">Disabled / Accessibility needs</option>
+            <option value="backward">Regional Diversity</option>
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Caste
+            Ethnic Group
           </label>
-          <input
-            type="text"
+          <select
             name="caste"
             value={formData.caste}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+          >
+            <option value="">Select ethnic group</option>
+            <option value="white-scottish">White — Scottish</option>
+            <option value="white-british">White — English, Welsh or Northern Irish</option>
+            <option value="white-irish">White — Irish</option>
+            <option value="white-other">White — Other</option>
+            <option value="mixed">Mixed or multiple ethnic groups</option>
+            <option value="asian-british">Asian or Asian British</option>
+            <option value="black-british">Black, Black British, Caribbean or African</option>
+            <option value="other-ethnic">Other ethnic group</option>
+            <option value="prefer-not">Prefer not to say</option>
+          </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Religion
+            Religion or Belief
           </label>
           <select
             name="religion"
@@ -91,15 +104,19 @@ const ExtraDetails = ({ onNext, onPrevious }) => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Select Religion</option>
-            <option value="hinduism">Hinduism</option>
-            <option value="buddhism">Buddhism</option>
-            <option value="islam">Islam</option>
+            <option value="">Select religion or belief</option>
+            <option value="no-religion">No religion</option>
             <option value="christianity">Christianity</option>
-            <option value="kirat">Kirat</option>
-            <option value="other">Other</option>
+            <option value="islam">Islam</option>
+            <option value="hinduism">Hinduism</option>
+            <option value="sikhism">Sikhism</option>
+            <option value="judaism">Judaism</option>
+            <option value="buddhism">Buddhism</option>
+            <option value="other">Other religion or belief</option>
+            <option value="prefer-not">Prefer not to say</option>
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Employment Status
@@ -110,13 +127,20 @@ const ExtraDetails = ({ onNext, onPrevious }) => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">Select Status</option>
+            <option value="">Select status</option>
             <option value="employed">Employed</option>
             <option value="unemployed">Unemployed</option>
             <option value="self-employed">Self-employed</option>
             <option value="student">Student</option>
           </select>
         </div>
+      </div>
+
+      <div className="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+        <p className="text-sm text-gray-700">
+          This information is collected for equal opportunities monitoring purposes only and will not be used in
+          the selection process. Providing this information is voluntary.
+        </p>
       </div>
 
       <div className="flex justify-between">

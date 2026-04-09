@@ -33,8 +33,8 @@ export const updatePersonalDetails = async (req, res) => {
     if (req.files) {
       if (req.files.photo) updates.photo = req.files.photo[0].filename;
       if (req.files.signature) updates.signature = req.files.signature[0].filename;
-      if (req.files.citizenshipFront) updates.citizenshipFront = req.files.citizenshipFront[0].filename;
-      if (req.files.citizenshipBack) updates.citizenshipBack = req.files.citizenshipBack[0].filename;
+      if (req.files.idDocumentFront) updates.idDocumentFront = req.files.idDocumentFront[0].filename;
+      if (req.files.idDocumentBack) updates.idDocumentBack = req.files.idDocumentBack[0].filename;
     }
 
     const user = await User.findByIdAndUpdate(

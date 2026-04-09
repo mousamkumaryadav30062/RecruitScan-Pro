@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff } from 'lucide-react'; // Using lucide-react icons
+import { Eye, EyeOff } from 'lucide-react';
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
@@ -65,99 +65,69 @@ const ChangePassword = () => {
   const passwordsMatch =
     formData.newPassword && formData.confirmPassword && formData.newPassword !== formData.confirmPassword;
 
-  const inputClass =
-    "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500";
+  const PasswordField = ({ name, label, placeholder }) => (
+    <div>
+      <label className="block text-sm font-bold text-gray-900 mb-1">{label}</label>
+      <div className="relative">
+        <input
+          type={showPassword[name] ? 'text' : 'password'}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none pr-12"
+          placeholder={placeholder}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => toggleShowPassword(name)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+        >
+          {showPassword[name] ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+      {name === 'confirmPassword' && passwordsMatch && (
+        <span className="text-red-500 text-sm mt-1 block">Passwords do not match</span>
+      )}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Change Password</h1>
-          <p className="text-gray-600 mt-2">Please change your password to continue</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      
 
-        <div className="space-y-6">
-          {/* Old Password */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Old Password
-            </label>
-            <input
-              type={showPassword.oldPassword ? "text" : "password"}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="bg-white border border-gray-300 w-full max-w-md p-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Change password</h1>
+          <p className="text-gray-600 text-sm mb-6 border-b border-gray-200 pb-4">
+            Please set a new password to continue using RecruitScan Pro
+          </p>
+
+          <div className="space-y-5">
+            <PasswordField
               name="oldPassword"
-              value={formData.oldPassword}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="Enter old password"
-              required
+              label="Current password"
+              placeholder="Enter your current password"
             />
-            <span
-              className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
-              onClick={() => toggleShowPassword('oldPassword')}
-            >
-              {showPassword.oldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
-
-          {/* New Password */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              New Password
-            </label>
-            <input
-              type={showPassword.newPassword ? "text" : "password"}
+            <PasswordField
               name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="Enter new password"
-              required
+              label="New password"
+              placeholder="Enter new password (min. 6 characters)"
             />
-            <span
-              className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
-              onClick={() => toggleShowPassword('newPassword')}
-            >
-              {showPassword.newPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-          </div>
-
-          {/* Confirm Password */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password
-            </label>
-            <input
-              type={showPassword.confirmPassword ? "text" : "password"}
+            <PasswordField
               name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="Confirm new password"
-              required
+              label="Confirm new password"
+              placeholder="Re-enter new password"
             />
-            <span
-              className="absolute right-3 top-[38px] cursor-pointer text-gray-500"
-              onClick={() => toggleShowPassword('confirmPassword')}
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full bg-green-700 text-white py-3 font-bold text-base hover:bg-green-800 transition disabled:opacity-50"
             >
-              {showPassword.confirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </span>
-
-            {/* Real-time mismatch message */}
-            {passwordsMatch && (
-              <span className="text-red-500 text-sm mt-1 block">
-                Passwords do not match
-              </span>
-            )}
+              {loading ? 'Changing...' : 'Change password'}
+            </button>
           </div>
-
-          {/* Submit Button */}
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Changing...' : 'Change Password'}
-          </button>
         </div>
       </div>
     </div>

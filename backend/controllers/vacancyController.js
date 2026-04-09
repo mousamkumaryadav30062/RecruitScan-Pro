@@ -102,7 +102,7 @@ export const getMyApplications = async (req, res) => {
       .populate('vacancy')
       .populate({
         path: 'user',
-        select: 'firstName lastName masterId email mobile citizenship gender photo signature citizenshipFront citizenshipBack'
+        select: 'firstName lastName masterId email mobile niNumber gender photo signature idDocumentFront idDocumentBack'
       })
       .sort('-createdAt');
     

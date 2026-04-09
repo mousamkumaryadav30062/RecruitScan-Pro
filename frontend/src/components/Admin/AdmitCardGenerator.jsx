@@ -290,8 +290,8 @@ const AdmitCardGenerator = () => {
                     <span className="font-medium text-blue-600">{selectedApp.symbolNumber}</span>
                   </div>
                   <div className="flex">
-                    <span className="w-40 text-gray-600">Citizenship No:</span>
-                    <span className="font-medium">{user?.citizenship}</span>
+                    <span className="w-40 text-gray-600">NI Number:</span>
+                    <span className="font-medium">{user?.niNumber}</span>
                   </div>
                   <div className="flex">
                     <span className="w-40 text-gray-600">Gender:</span>

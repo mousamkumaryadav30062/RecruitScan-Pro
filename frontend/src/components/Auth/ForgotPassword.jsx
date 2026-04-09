@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -17,7 +17,6 @@ const ForgotPassword = () => {
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error('Please enter a valid email address');
@@ -27,10 +26,8 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       const { data } = await api.post('/auth/forgot-password', { email });
-      toast.success(data.message || 'Password reset code sent to your email!');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      toast.success(data.message || 'A new password has been sent to your email!');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send reset code');
     } finally {
@@ -39,59 +36,55 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-        <button
-          onClick={() => navigate('/login')}
-          className="flex items-center text-gray-600 hover:text-gray-800 mb-6 transition"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Login
-        </button>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      
 
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="w-8 h-8 text-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800">Forgot Password?</h1>
-          <p className="text-gray-600 mt-2">
-            Enter your email address and we'll send you a new password
-          </p>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your registered email"
-              required
-            />
-          </div>
-
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="bg-white border border-gray-300 w-full max-w-md p-8">
           <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => navigate('/login')}
+            className="flex items-center text-blue-700 hover:underline text-sm font-medium mb-6"
           >
-            {loading ? 'Sending...' : 'Send Reset Code'}
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back to sign in
           </button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Remember your password?{' '}
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Reset your password</h1>
+          <p className="text-gray-600 text-sm mb-6 border-b border-gray-200 pb-4">
+            Enter your registered email address and we will send you a new temporary password.
+          </p>
+
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-bold text-gray-900 mb-1">
+                Email address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
+                placeholder="Enter your registered email"
+                required
+              />
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full bg-green-700 text-white py-3 font-bold text-base hover:bg-green-800 transition disabled:opacity-50"
+            >
+              {loading ? 'Sending...' : 'Send new password'}
+            </button>
+
+            <div className="text-center">
               <button
                 onClick={() => navigate('/login')}
-                className="text-blue-600 hover:underline font-medium"
+                className="text-blue-700 hover:underline text-sm font-medium"
               >
-                Login here
+                Remember your password? Sign in
               </button>
-            </p>
+            </div>
           </div>
         </div>
       </div>

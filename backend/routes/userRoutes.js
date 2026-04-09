@@ -20,8 +20,8 @@ router.get('/profile', getProfile);
 router.put('/profile/personal', upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'signature', maxCount: 1 },
-  { name: 'citizenshipFront', maxCount: 1 },
-  { name: 'citizenshipBack', maxCount: 1 }
+  { name: 'idDocumentFront', maxCount: 1 },
+  { name: 'idDocumentBack', maxCount: 1 }
 ]), updatePersonalDetails);
 router.put('/profile/address', updateAddressDetails);
 router.put('/profile/extra', updateExtraDetails);

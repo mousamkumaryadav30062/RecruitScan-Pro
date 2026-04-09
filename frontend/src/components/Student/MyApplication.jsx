@@ -267,8 +267,8 @@ const MyApplication = () => {
                         </div>
 
                         <div className="print-row">
-                          <span className="print-label">Citizenship:</span>
-                          <span className="print-value">{selectedAdmitCard.user?.citizenship}</span>
+                          <span className="print-label">NI Number:</span>
+                          <span className="print-value">{selectedAdmitCard.user?.niNumber}</span>
                         </div>
 
                         <div className="print-row">
@@ -324,29 +324,29 @@ const MyApplication = () => {
                     </div>
                   </div>
 
-                  {(selectedAdmitCard.user?.citizenshipFront || selectedAdmitCard.user?.citizenshipBack) && (
+                  {(selectedAdmitCard.user?.idDocumentFront || selectedAdmitCard.user?.idDocumentBack) && (
                     <div className="print-section mb-8">
                       <h3 className="font-semibold text-gray-800 mb-4 border-b pb-2 text-lg">
-                        Citizenship
+                        Identity Document
                       </h3>
 
                       <div className="print-doc-grid grid grid-cols-1 md:grid-cols-2 gap-5">
-                        {selectedAdmitCard.user?.citizenshipFront && (
+                        {selectedAdmitCard.user?.idDocumentFront && (
                           <div className="print-box print-citizenship border border-gray-300 rounded-2xl p-3 bg-gray-50">
                             <img
-                              src={`${API_URL}/uploads/${selectedAdmitCard.user.citizenshipFront}`}
-                              alt="Citizenship Front"
+                              src={`${API_URL}/uploads/${selectedAdmitCard.user.idDocumentFront}`}
+                              alt="Identity Document Front"
                               className="w-full h-52 object-cover rounded-xl"
                             />
                             <p className="text-center text-xs text-gray-600 mt-2">Front</p>
                           </div>
                         )}
 
-                        {selectedAdmitCard.user?.citizenshipBack && (
+                        {selectedAdmitCard.user?.idDocumentBack && (
                           <div className="print-box print-citizenship border border-gray-300 rounded-2xl p-3 bg-gray-50">
                             <img
-                              src={`${API_URL}/uploads/${selectedAdmitCard.user.citizenshipBack}`}
-                              alt="Citizenship Back"
+                              src={`${API_URL}/uploads/${selectedAdmitCard.user.idDocumentBack}`}
+                              alt="Identity Document Back"
                               className="w-full h-52 object-cover rounded-xl"
                             />
                             <p className="text-center text-xs text-gray-600 mt-2">Back</p>

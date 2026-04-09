@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,8 +13,7 @@ const Register = () => {
     gender: '',
     email: '',
     mobile: '',
-    citizenship: '',
-    nid: ''
+    niNumber: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -35,20 +36,15 @@ const Register = () => {
           ? ''
           : 'Mobile must be 11 digits and start with 07';
 
-      case 'citizenship':
-        return /^[0-9\-\/]+$/.test(value)
-          ? ''
-          : 'Only numbers, - or / allowed';
-
-      case 'nid':
-        return /^\d{10}$/.test(value)
-          ? ''
-          : 'NID must be exactly 10 digits';
+      case 'niNumber':
+  return /^[A-Z]{2}[0-9]{6}[A-Z]$/i.test(value.replace(/\s/g, ''))
+    ? ''
+    : 'NI Number must be in format: AB123456C';
 
       case 'dobAD':
         return value && new Date(value) > new Date()
           ? 'Future date not allowed'
-          : value ? '' : 'Date of Birth (AD) is required';
+          : value ? '' : 'Date of Birth is required';
 
       default:
         return '';
@@ -67,6 +63,10 @@ const Register = () => {
       updatedValue = value.toLowerCase();
     }
 
+    if (name === 'niNumber') {
+      updatedValue = value.toUpperCase();
+    }
+
     setFormData(prev => ({ ...prev, [name]: updatedValue }));
     setErrors(prev => ({ ...prev, [name]: validate(name, updatedValue) }));
   };
@@ -74,7 +74,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Final check before submit
     const validationErrors = {};
     Object.keys(formData).forEach(field => {
       const err = validate(field, formData[field]);
@@ -87,8 +86,7 @@ const Register = () => {
       return;
     }
 
-    // Also check required fields
-    const requiredFields = ['firstName', 'lastName', 'gender', 'email', 'mobile', 'citizenship', 'nid'];
+    const requiredFields = ['firstName', 'lastName', 'gender', 'email', 'mobile', 'niNumber', 'dobAD'];
     const missing = requiredFields.find(f => !formData[f]?.trim());
     if (missing) {
       toast.error('Please fill all required fields');
@@ -107,137 +105,186 @@ const Register = () => {
     }
   };
 
+  const handleGoogleSuccess = (credentialResponse) => {
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      const { given_name, family_name, email } = decoded;
+      setFormData(prev => ({
+        ...prev,
+        firstName: (given_name || '').toUpperCase(),
+        lastName: (family_name || '').toUpperCase(),
+        email: email || ''
+      }));
+      toast.success('Google details pre-filled. Please complete the remaining fields.');
+    } catch {
+      toast.error('Google sign-in failed. Please fill in manually.');
+    }
+  };
+
   const errorSpan = (field) =>
-    errors[field] && <span className="text-red-500 text-sm">{errors[field]}</span>;
+    errors[field] && <span className="text-red-500 text-sm mt-1 block">{errors[field]}</span>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 overflow-y-auto">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8 my-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Registration Form
+    <div className="min-h-screen bg-gray-50 p-4 overflow-y-auto">
+      
+
+      <div className="max-w-3xl mx-auto bg-white border border-gray-300 p-8 mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          Create a new account
         </h1>
+        <p className="text-gray-600 text-sm mb-6 border-b border-gray-200 pb-4">
+          Register to apply for Scottish Civil Service examinations and vacancies. All fields marked with * are required.
+        </p>
+
+        {/* Google Sign-in */}
+        <div className="mb-6">
+          <p className="text-sm font-medium text-gray-700 mb-3">Sign in with Google to pre-fill your details:</p>
+          <div className="flex justify-start">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error('Google sign-in failed')}
+              text="continue_with"
+              shape="rectangular"
+              theme="outline"
+            />
+          </div>
+          <div className="flex items-center my-4">
+            <hr className="flex-grow border-gray-300" />
+            <span className="px-3 text-sm text-gray-500">or complete the form below</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div>
-            <label className="block text-sm font-medium mb-2">First Name *</label>
+            <label className="block text-sm font-bold text-gray-900 mb-1">First Name *</label>
             <input
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              placeholder="Enter your First name"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="Enter your first name"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
             />
             {errorSpan('firstName')}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Last Name *</label>
+            <label className="block text-sm font-bold text-gray-900 mb-1">Last Name *</label>
             <input
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              placeholder="Enter your Last name"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="Enter your last name"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
             />
             {errorSpan('lastName')}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Gender *</label>
+            <label className="block text-sm font-bold text-gray-900 mb-1">Gender *</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none bg-white"
             >
-              <option value="">Select Gender</option>
+              <option value="">Select gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="other">Prefer not to say / Other</option>
             </select>
+            {errorSpan('gender')}
           </div>
-          <div>
-  <label className="block text-sm font-medium mb-2">Date of Birth (A.D.) *</label>
-  <input
-    type="date"
-    name="dobAD"
-    value={formData.dobAD}
-    onChange={handleChange}
-    className="w-full px-4 py-2 border rounded-lg"
-  />
-  {errorSpan('dobAD')}
-</div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Email *</label>
+            <label className="block text-sm font-bold text-gray-900 mb-1">Date of Birth *</label>
+            <input
+              type="date"
+              name="dobAD"
+              value={formData.dobAD}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
+            />
+            {errorSpan('dobAD')}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-900 mb-1">Email Address *</label>
             <input
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your Email"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="name@example.com"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
             />
             {errorSpan('email')}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Mobile Number *</label>
+            <label className="block text-sm font-bold text-gray-900 mb-1">UK Mobile Number *</label>
+            <p className="text-xs text-gray-500 mb-1">Format: 07XXXXXXXXX</p>
             <input
               name="mobile"
               value={formData.mobile}
               onChange={handleChange}
               placeholder="07XXXXXXXXX"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
               maxLength={11}
             />
             {errorSpan('mobile')}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Citizenship Number *</label>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-bold text-gray-900 mb-1">National Insurance Number *</label>
+            <p className="text-xs text-gray-500 mb-1">Format: AB123456C — do not include spaces</p>
             <input
-              name="citizenship"
-              value={formData.citizenship}
-              onChange={handleChange}
-              placeholder="Enter your Citizenship details"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-            {errorSpan('citizenship')}
-          </div>
+              name="niNumber"
+              value={formData.niNumber}
+              onChange={(e) => {
+                const cleanedValue = e.target.value
+                  .toUpperCase()
+                  .replace(/\s/g, '')
+                  .replace(/[^A-Z0-9]/g, '')
+                  .slice(0, 9);
 
-          <div>
-            <label className="block text-sm font-medium mb-2">NID Number *</label>
-            <input
-              name="nid"
-              value={formData.nid}
-              onChange={handleChange}
-              placeholder="Enter your NID card details"
-              className="w-full px-4 py-2 border rounded-lg"
-              maxLength={10}
+                setFormData(prev => ({ ...prev, niNumber: cleanedValue }));
+                setErrors(prev => ({ ...prev, niNumber: validate('niNumber', cleanedValue) }));
+              }}
+              placeholder="e.g. AB123456C"
+              className="w-full px-3 py-2 border-2 border-gray-400 focus:border-blue-600 focus:outline-none"
+              maxLength={9}
             />
-            {errorSpan('nid')}
+            {errorSpan('niNumber')}
           </div>
 
           <div className="md:col-span-2">
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+              className="w-full bg-green-700 text-white py-3 font-bold text-base hover:bg-green-800 transition disabled:opacity-50"
             >
-              {loading ? 'Registering...' : 'Register'}
+              {loading ? 'Registering...' : 'Create account'}
             </button>
           </div>
 
           <div className="md:col-span-2 text-center">
             <button
               onClick={() => navigate('/login')}
-              className="text-blue-600 hover:underline"
+              className="text-blue-700 hover:underline text-sm font-medium"
             >
-              Already have an account? Login
+              Already have an account? Sign in
             </button>
           </div>
 
+        </div>
+
+        <div className="mt-8 p-4 bg-blue-50 border-l-4 border-blue-600">
+          <p className="text-xs text-gray-700">
+            <strong>Privacy Notice:</strong> This information is collected under the authority of the Civil Service Act 1978.
+            Your data will be processed in accordance with the UK GDPR and the Data Protection Act 2018 for the purpose of
+            managing civil service recruitment. For more information, see our <span className="text-blue-700 underline cursor-pointer">Privacy Policy</span>.
+          </p>
         </div>
       </div>
     </div>

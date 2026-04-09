@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import toast from 'react-hot-toast';
-import { provinces, districtsByProvince } from '../../../utils/nepalData';
+import { provinces, districtsByProvince } from '../../../utils/ukData';
 
 
 const AddressDetails = ({ onNext, onPrevious }) => {
@@ -109,7 +109,7 @@ const AddressDetails = ({ onNext, onPrevious }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Part *
+              Nation *
             </label>
             <select
               value={address.province}
@@ -117,7 +117,7 @@ const AddressDetails = ({ onNext, onPrevious }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               disabled={addressType === 'temporaryAddress' && sameAddress}
             >
-              <option value="">Select Part</option>
+              <option value="">Select Nation</option>
               {provinces.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
@@ -125,7 +125,7 @@ const AddressDetails = ({ onNext, onPrevious }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Division *
+              Council Area / Region *
             </label>
             <select
               value={address.district}
@@ -133,7 +133,7 @@ const AddressDetails = ({ onNext, onPrevious }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               disabled={addressType === 'temporaryAddress' && sameAddress}
             >
-              <option value="">Select Division</option>
+              <option value="">Select Council Area / Region</option>
               {districts.map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}
@@ -141,36 +141,39 @@ const AddressDetails = ({ onNext, onPrevious }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Local Body *
+              City / Town *
             </label>
             <input
               type="text"
               value={address.localBody}
               onChange={(e) => handleChange(addressType, 'localBody', e.target.value)}
+              placeholder="e.g. Edinburgh"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               disabled={addressType === 'temporaryAddress' && sameAddress}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ward No. *
+              Postcode *
             </label>
             <input
               type="text"
               value={address.wardNo}
               onChange={(e) => handleChange(addressType, 'wardNo', e.target.value)}
+              placeholder="e.g. EH1 1AJ"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               disabled={addressType === 'temporaryAddress' && sameAddress}
             />
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Street *
+              Street Address *
             </label>
             <input
               type="text"
               value={address.tole}
               onChange={(e) => handleChange(addressType, 'tole', e.target.value)}
+              placeholder="House number and street name"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               disabled={addressType === 'temporaryAddress' && sameAddress}
             />

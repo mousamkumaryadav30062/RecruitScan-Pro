@@ -110,11 +110,11 @@ const Preview = ({ onPrevious }) => {
             label="Date of Birth (A.D.)"
             value={profile.dobAD ? new Date(profile.dobAD).toLocaleDateString('en-CA') : ''}
           />
-          <InfoItem label="Citizenship Number" value={profile.citizenship} />
-          {profile.fatherName && <InfoItem label="Father's Name" value={profile.fatherName} />}
-          {profile.motherName && <InfoItem label="Mother's Name" value={profile.motherName} />}
-          {profile.grandFatherName && (
-            <InfoItem label="Grandfather's Name" value={profile.grandFatherName} />
+          <InfoItem label="National Insurance Number" value={profile.niNumber} />
+          {profile.fatherName && <InfoItem label="Father's / Parent's Name" value={profile.fatherName} />}
+          {profile.motherName && <InfoItem label="Mother's / Parent's Name" value={profile.motherName} />}
+          {profile.spouseName && (
+            <InfoItem label="Spouse / Partner's Name" value={profile.spouseName} />
           )}
         </div>
       </section>
@@ -143,19 +143,19 @@ const Preview = ({ onPrevious }) => {
             />
           )}
 
-          {profile.citizenshipFront && (
+          {profile.idDocumentFront && (
             <DocumentImageCard
-              title="Citizenship Front"
-              file={profile.citizenshipFront}
-              alt="Citizenship Front"
+              title="Identity Document — Front"
+              file={profile.idDocumentFront}
+              alt="Identity Document Front"
             />
           )}
 
-          {profile.citizenshipBack && (
+          {profile.idDocumentBack && (
             <DocumentImageCard
-              title="Citizenship Back"
-              file={profile.citizenshipBack}
-              alt="Citizenship Back"
+              title="Identity Document — Back"
+              file={profile.idDocumentBack}
+              alt="Identity Document Back"
             />
           )}
         </div>
@@ -173,22 +173,22 @@ const Preview = ({ onPrevious }) => {
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
               <h4 className="font-semibold text-gray-800 mb-3">Permanent Address</h4>
               <div className="space-y-2 text-sm text-gray-700">
-                <p><span className="font-medium">Province:</span> {profile.permanentAddress.province || '-'}</p>
-                <p><span className="font-medium">District:</span> {profile.permanentAddress.district || '-'}</p>
-                <p><span className="font-medium">Local Body:</span> {profile.permanentAddress.localBody || '-'}</p>
-                <p><span className="font-medium">Ward No:</span> {profile.permanentAddress.wardNo || '-'}</p>
-                <p><span className="font-medium">Tole:</span> {profile.permanentAddress.tole || '-'}</p>
+                <p><span className="font-medium">Nation:</span> {profile.permanentAddress.province || '-'}</p>
+                <p><span className="font-medium">Council Area / Region:</span> {profile.permanentAddress.district || '-'}</p>
+                <p><span className="font-medium">City / Town:</span> {profile.permanentAddress.localBody || '-'}</p>
+                <p><span className="font-medium">Postcode:</span> {profile.permanentAddress.wardNo || '-'}</p>
+                <p><span className="font-medium">Street Address:</span> {profile.permanentAddress.tole || '-'}</p>
               </div>
             </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
               <h4 className="font-semibold text-gray-800 mb-3">Temporary Address</h4>
               <div className="space-y-2 text-sm text-gray-700">
-                <p><span className="font-medium">Province:</span> {profile.temporaryAddress?.province || '-'}</p>
-                <p><span className="font-medium">District:</span> {profile.temporaryAddress?.district || '-'}</p>
-                <p><span className="font-medium">Local Body:</span> {profile.temporaryAddress?.localBody || '-'}</p>
-                <p><span className="font-medium">Ward No:</span> {profile.temporaryAddress?.wardNo || '-'}</p>
-                <p><span className="font-medium">Tole:</span> {profile.temporaryAddress?.tole || '-'}</p>
+                <p><span className="font-medium">Nation:</span> {profile.temporaryAddress?.province || '-'}</p>
+                <p><span className="font-medium">Council Area / Region:</span> {profile.temporaryAddress?.district || '-'}</p>
+                <p><span className="font-medium">City / Town:</span> {profile.temporaryAddress?.localBody || '-'}</p>
+                <p><span className="font-medium">Postcode:</span> {profile.temporaryAddress?.wardNo || '-'}</p>
+                <p><span className="font-medium">Street Address:</span> {profile.temporaryAddress?.tole || '-'}</p>
               </div>
             </div>
           </div>
@@ -204,8 +204,8 @@ const Preview = ({ onPrevious }) => {
           </div>
 
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {profile.quota && <InfoItem label="Quota" value={profile.quota} />}
-            {profile.caste && <InfoItem label="Caste" value={profile.caste} />}
+            {profile.quota && <InfoItem label="Application Category" value={profile.quota} />}
+            {profile.caste && <InfoItem label="Ethnic Group" value={profile.caste} />}
             {profile.religion && <InfoItem label="Religion" value={profile.religion} />}
             {profile.employmentStatus && (
               <InfoItem label="Employment Status" value={profile.employmentStatus} />

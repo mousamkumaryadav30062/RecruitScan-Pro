@@ -1,19 +1,22 @@
-# Exam Roll System
+# RecruitScan Pro — Exam Roll System (UK / Scotland)
 
-A full-stack exam roll / vacancy application management platform built with **React + Vite** on the frontend and **Node.js + Express + MongoDB** on the backend.
+A full-stack exam roll and vacancy application management platform built for the **United Kingdom (Scotland)** civil service recruitment process. Built with **React + Vite** on the frontend and **Node.js + Express + MongoDB** on the backend.
 
 The application supports:
 
-- student registration with auto-generated credentials
-- login with email or mobile number
-- forced password change on first login / after password reset
-- multi-step profile completion with document uploads
-- vacancy publishing and application workflow
-- admin-side application review and status management
-- automatic and manual symbol number assignment
-- exam center allocation
-- admit card generation and printing
-- email notifications for registration, password reset, approval, and rejection
+- Applicant registration with National Insurance Number (NI Number) as primary identity
+- Sign in with Google (pre-fills registration details)
+- Login with email or mobile number
+- Forced password change on first login / after password reset
+- Multi-step profile completion with document uploads (including UK identity documents)
+- UK address system: Nation → Council Area → City/Town → Postcode → Street Address
+- Equal opportunities monitoring (ethnic group, religion, employment status)
+- Vacancy publishing and application workflow
+- Admin-side application review and status management
+- Automatic and manual symbol number assignment
+- Exam centre allocation
+- Admit card generation and printing
+- Email notifications for registration, password reset, approval, and rejection
 
 ---
 
@@ -29,43 +32,43 @@ The application supports:
 - [Installation and Setup](#installation-and-setup)
 - [Run Commands](#run-commands)
 - [Seed Admin User](#seed-admin-user)
+- [Google OAuth Setup](#google-oauth-setup)
 - [Frontend Routes](#frontend-routes)
 - [Backend API Routes](#backend-api-routes)
 - [Data Models](#data-models)
 - [Important Business Logic](#important-business-logic)
-- [Implementation Notes from Source Review](#implementation-notes-from-source-review)
-- [Suggested Improvements](#suggested-improvements)
 
 ---
 
 ## Overview
 
-This project is a role-based exam application and roll management system.
+This project is a role-based exam application and roll management system designed for UK (Scotland) civil service recruitment.
 
-### Student-side flow
+### Applicant-side flow
 
-1. A student registers with basic identity information.
-2. The backend generates a **Master ID** and a **random password**.
-3. Credentials are sent to the student by email.
-4. The student logs in using **email or mobile number + password**.
-5. On first login, the student is redirected to change their password.
-6. The student completes a multi-step profile:
-   - personal details
-   - address details
-   - quota / extra details
+1. An applicant registers with basic identity information including their **National Insurance (NI) Number**.
+2. Optionally, they can use **Sign in with Google** to pre-fill their name and email.
+3. The backend generates a **Master ID** and a **random password**.
+4. Credentials are sent to the applicant by email.
+5. The applicant logs in using **email or mobile number + password**, or signs in via Google.
+6. On first login, the applicant is redirected to change their password.
+7. The applicant completes a multi-step profile:
+   - personal details (with UK identity document upload)
+   - UK address details (Nation, Council Area, City/Town, Postcode, Street)
+   - equal opportunities information
    - education details and documents
    - profile preview and final submission
-7. After profile completion, the student can apply to published vacancies.
-8. The student can track application status and, once available, view / print the admit card.
+8. After profile completion, the applicant can apply to published vacancies.
+9. The applicant can track application status and, once available, view / print the admit card.
 
 ### Admin-side flow
 
 1. Admin logs in from a separate admin login screen.
 2. Admin can create, edit, and delete vacancies.
-3. Admin can view all students and all applications.
+3. Admin can view all applicants and all applications.
 4. Admin can approve or reject applications.
 5. Admin can auto-assign symbol numbers.
-6. Admin can assign exam centers by candidate range.
+6. Admin can assign exam centres by candidate range.
 7. Admin can generate admit cards individually or in bulk.
 8. Admin dashboard displays charts, counts, and application analytics.
 
@@ -79,7 +82,9 @@ This project is a role-based exam application and roll management system.
 - **Vite 7**
 - **React Router DOM 7**
 - **Axios**
-- **Tailwind CSS**
+- **Tailwind CSS** (GOV.UK-inspired styling)
+- **@react-oauth/google** for Google Sign-In
+- **jwt-decode** for decoding Google credentials
 - **Recharts**
 - **react-hot-toast**
 - **lucide-react**
@@ -93,6 +98,7 @@ This project is a role-based exam application and roll management system.
 - **bcryptjs** for password hashing
 - **multer** for file uploads
 - **nodemailer** for email sending
+- **google-auth-library** for Google OAuth verification
 - **express-validator**
 - **cookie-parser** and **cors**
 
@@ -110,6 +116,7 @@ This project is a role-based exam application and roll management system.
 Frontend (React/Vite)  --->  Backend API (Express)  --->  MongoDB
         |                         |
         |                         ├── JWT auth
+        |                         ├── Google OAuth (google-auth-library)
         |                         ├── Multer uploads
         |                         ├── Nodemailer
         |                         └── Static files: /uploads
@@ -119,18 +126,17 @@ Frontend (React/Vite)  --->  Backend API (Express)  --->  MongoDB
 
 ### Authentication design
 
-- Student auth uses JWT bearer tokens.
+- Applicant auth uses JWT bearer tokens.
 - Admin auth uses separate JWT bearer tokens.
-- Student token is stored in local storage as `token`.
-- Student user data is stored in local storage as `user`.
+- Applicant token is stored in local storage as `token`.
+- Applicant user data is stored in local storage as `user`.
 - Admin token is stored in local storage as `adminToken`.
 - Admin data is stored in local storage as `admin`.
+- Google OAuth verifies the Google credential on the backend using `google-auth-library`.
 
 ---
 
 ## Project Structure
-
-> `node_modules`, `.git`, and individual uploaded runtime files are omitted for readability.
 
 ```text
 exam-roll-system/
@@ -145,7 +151,6 @@ exam-roll-system/
 │   ├── controllers/
 │   │   ├── adminController.js
 │   │   ├── authController.js
-│   │   ├── mailTestController.js
 │   │   ├── userController.js
 │   │   └── vacancyController.js
 │   ├── middleware/
@@ -158,39 +163,27 @@ exam-roll-system/
 │   ├── routes/
 │   │   ├── adminRoutes.js
 │   │   ├── authRoutes.js
-│   │   ├── mailTestRoutes.js
 │   │   ├── userRoutes.js
 │   │   └── vacancyRoutes.js
 │   ├── scripts/
 │   │   └── createAdmin.js
 │   ├── uploads/
-│   │   └── ... uploaded photos, signatures, citizenship files, education docs ...
 │   └── utils/
 │       └── emailService.js
 └── frontend/
     ├── .env
-    ├── .gitignore
-    ├── README.md
-    ├── eslint.config.js
-    ├── index.html
     ├── package.json
-    ├── package-lock.json
-    ├── postcss.config.js
-    ├── tailwind.config.js
     ├── vite.config.js
-    ├── public/
-    │   └── vite.svg
+    ├── tailwind.config.js
     └── src/
         ├── App.jsx
         ├── main.jsx
         ├── index.css
-        ├── assets/
-        │   └── react.svg
         ├── context/
         │   └── AuthContext.jsx
         ├── utils/
         │   ├── api.js
-        │   └── nepalData.js
+        │   └── ukData.js
         └── components/
             ├── Admin/
             │   ├── AdminDashboard.jsx
@@ -227,7 +220,7 @@ exam-roll-system/
 
 ## Core Functionalities
 
-### Student Functionalities
+### Applicant Functionalities
 
 ### 1. Registration
 
@@ -236,166 +229,75 @@ exam-roll-system/
   - last name
   - date of birth
   - gender
-  - email
-  - mobile
-  - citizenship number
-  - national ID (NID)
-- Duplicate validation exists for:
-  - email
-  - mobile
-  - citizenship
-  - NID
+  - email address
+  - UK mobile number (07XXXXXXXXX)
+  - National Insurance Number (format: AB123456C)
+- Optional: use **Sign in with Google** to pre-fill name and email
+- Duplicate validation for: email, mobile, NI Number
 - Backend auto-generates:
   - `masterId`
   - random initial password
-- Credentials are emailed to the student.
+- Credentials are emailed to the applicant
 
 ### 2. Login and Password Management
 
-- Student can log in using **email or mobile number**.
-- First login forces password change.
-- Forgot password generates a new random password and emails it to the user.
-- Password hashes are stored securely using `bcryptjs`.
+- Sign in using **email or mobile number + password**
+- Sign in with **Google** (account must already exist in the system)
+- First login forces password change
+- Forgot password generates a new random password and emails it to the applicant
+- Password hashes are stored securely using `bcryptjs`
 
 ### 3. Multi-step Profile Completion
 
-The student profile is completed in five steps:
+The applicant profile is completed in five steps:
 
 1. **Personal Details**
-   - father name
-   - mother name
-   - grandfather name
-   - citizenship issue place/date
-   - photo upload
+   - father / parent name
+   - mother / parent name
+   - spouse / partner name
+   - photo upload (passport-size)
    - signature upload
-   - citizenship front upload
-   - citizenship back upload
+   - UK identity document front upload (passport, driving licence)
+   - UK identity document back upload
 
-2. **Address Details**
-   - permanent address
-   - temporary address
-   - same-address toggle
+2. **Address Details** (UK format)
+   - Nation (England, Scotland, Wales, Northern Ireland)
+   - Council Area / Region
+   - City / Town
+   - Postcode (e.g. EH1 1AJ)
+   - Street Address
 
-3. **Extra Details**
-   - quota
-   - caste
-   - religion
-   - employment status
+3. **Equal Opportunities Details**
+   - Application category (open, women, disabled, regional diversity)
+   - Ethnic group (UK census categories)
+   - Religion or belief
+   - Employment status
 
 4. **Document / Education Details**
-   - add education history
-   - upload multiple education documents
-   - assign document type per file
+   - Add education history
+   - Upload multiple education documents
+   - Assign document type per file
 
 5. **Preview**
-   - review all data
-   - finalize profile completion
+   - Review all data
+   - Finalise profile completion
 
 ### 4. Vacancy Application
 
-- Students can view active vacancies.
-- Students can apply only after profile completion.
-- Application requires quota selection.
-- Existing duplicate applications are blocked.
-- Re-apply is allowed for rejected applications when `canReapply` is enabled.
-- Fee is calculated based on date window:
-  - regular fee before `lastDate`
-  - double fee after `lastDate`
+- Applicants can view active vacancies
+- Applicants can apply only after profile completion
+- Application requires category selection
+- Existing duplicate applications are blocked
+- Re-apply is allowed for rejected applications when `canReapply` is enabled
+- Fee is calculated based on date window
 
 ### 5. My Applications
 
-- View all submitted applications.
-- Track status:
-  - pending
-  - approved
-  - rejected
-  - paid
-- View fee amount, quota, symbol number, exam center.
-- If rejected, view rejection reason.
-- If admit card is generated, preview and print it.
-
-### 6. Student Dashboard
-
-- Total application count summary
-- Pending / approved / rejected / paid stats
-- Company-wise application chart
-- Vacancy countdown tracker
-- Recent application activity
-
----
-
-### Admin Functionalities
-
-### 1. Admin Authentication
-
-- Separate admin login screen
-- JWT-protected admin routes
-- Admin registration API exists in backend
-
-### 2. Vacancy Management
-
-- Create vacancy
-- Edit vacancy
-- Delete vacancy (only when no applications exist)
-- Fields include:
-  - vacancy name
-  - last date
-  - double fee last date
-  - regular fee
-  - double fee
-  - description
-  - active status
-
-### 3. Application Management
-
-- View all applications
-- Filter by vacancy
-- Filter by status
-- Open full application details
-- Approve application
-- Reject application with mandatory rejection reason
-- Approval / rejection triggers email notifications
-
-### 4. Student Management
-
-- View all registered students
-- Search by:
-  - name
-  - master ID
-  - email
-  - mobile
-- See profile completion status
-
-### 5. Symbol Assignment
-
-- View approved applications only
-- Auto-assign symbol numbers
-- Manual symbol / center editing for individual applications
-- Assign exam center by candidate range
-
-### 6. Admit Card Generation
-
-- Generate admit card for one candidate
-- Generate admit cards in bulk for a selected vacancy
-- Requires:
-  - approved application
-  - symbol number assigned
-  - exam center assigned
-- Stores exam date, exam time, and exam rules
-
-### 7. Admin Dashboard Analytics
-
-- Total applications
-- Pending applications
-- Approved applications
-- Rejected applications
-- Paid applications
-- Gender distribution chart
-- Application status overview
-- Company-wise trend chart
-- Vacancy countdown widgets
-- Exam schedule summary
-- Recent applications list
+- View all submitted applications
+- Track status: pending, approved, rejected, paid
+- View fee amount, category, symbol number, exam centre
+- If rejected, view rejection reason
+- If admit card is generated, preview and print it
 
 ---
 
@@ -403,17 +305,14 @@ The student profile is completed in five steps:
 
 | Service | Default | Notes |
 |---|---:|---|
-| Frontend dev server | `5173` | Vite default; also referenced by backend `CLIENT_URL` |
+| Frontend dev server | `5173` | Vite default |
 | Backend API server | `5000` | From backend `.env` / `server.js` |
 | API base URL | `http://localhost:5000/api` | Used by frontend `VITE_API_URL` |
 | Static uploads | `http://localhost:5000/uploads/...` | Uploaded files are publicly served |
-| Health / root API | `http://localhost:5000/` | Returns API message |
 
 ---
 
 ## Environment Variables
-
-Use your own values. Do **not** commit real secrets to source control.
 
 ### Backend: `backend/.env`
 
@@ -426,9 +325,10 @@ EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your_email@example.com
 EMAIL_PASSWORD=your_email_app_password
-EMAIL_FROM=Exam Roll System <no-reply@example.com>
+EMAIL_FROM=RecruitScan Pro <no-reply@example.com>
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
 
 ### Frontend: `frontend/.env`
@@ -436,49 +336,28 @@ CLIENT_URL=http://localhost:5173
 ```env
 VITE_API_URL=http://localhost:5000/api
 VITE_API_BASE_URL=http://localhost:5000
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
-
-### Notes
-
-- `VITE_API_URL` is the main API base used by the frontend.
-- `VITE_API_BASE_URL` exists in the frontend env file, but the current API helper primarily uses `VITE_API_URL`.
-- Email delivery depends on valid SMTP credentials.
-- Backend CORS is configured to allow the `CLIENT_URL` origin.
 
 ---
 
 ## Installation and Setup
 
-> The zip appears to include installed dependencies. A clean reinstall is recommended after extraction.
-
-### 1. Extract the project
-
-```bash
-unzip exam-roll-system.zip -d exam-roll-system
-cd exam-roll-system
-```
-
-### 2. Recommended clean install
-
-```bash
-rm -rf backend/node_modules frontend/node_modules frontend/dist
-```
-
-### 3. Install backend dependencies
+### 1. Install backend dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-### 4. Install frontend dependencies
+### 2. Install frontend dependencies
 
 ```bash
 cd ../frontend
 npm install
 ```
 
-### 5. Configure environment files
+### 3. Configure environment files
 
 Create / update:
 
@@ -487,7 +366,7 @@ backend/.env
 frontend/.env
 ```
 
-### 6. Start MongoDB
+### 4. Start MongoDB
 
 Make sure MongoDB is running and `MONGODB_URI` is valid.
 
@@ -500,13 +379,6 @@ Make sure MongoDB is running and `MONGODB_URI` is valid.
 ```bash
 cd backend
 npm run dev
-```
-
-### Start backend in normal mode
-
-```bash
-cd backend
-npm start
 ```
 
 ### Start frontend in development mode
@@ -523,33 +395,16 @@ cd frontend
 npm run build
 ```
 
-### Preview built frontend
-
-```bash
-cd frontend
-npm run preview
-```
-
-### Access the app
-
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5000`
-- API base: `http://localhost:5000/api`
-
 ---
 
 ## Seed Admin User
-
-The project contains a helper script to create a default admin.
-
-### Command
 
 ```bash
 cd backend
 node scripts/createAdmin.js
 ```
 
-### Default admin credentials created by the script
+Default admin credentials:
 
 ```text
 Email: admin@examroll.com
@@ -560,30 +415,43 @@ Change this password immediately after first use.
 
 ---
 
+## Google OAuth Setup
+
+To enable Google Sign-In:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Navigate to **APIs & Services → Credentials**
+4. Click **Create Credentials → OAuth 2.0 Client ID**
+5. Set the application type to **Web application**
+6. Add `http://localhost:5173` to **Authorised JavaScript origins**
+7. Add `http://localhost:5173` to **Authorised redirect URIs**
+8. Copy the **Client ID**
+9. Add it to both `.env` files:
+   - `backend/.env`: `GOOGLE_CLIENT_ID=your_client_id`
+   - `frontend/.env`: `VITE_GOOGLE_CLIENT_ID=your_client_id`
+
+> **Note:** Google Sign-In on the **registration page** pre-fills the applicant's name and email from their Google account. The applicant must still provide their NI Number, mobile number, date of birth, and gender to complete registration.
+>
+> Google Sign-In on the **login page** signs in an existing account whose email matches the Google account email.
+
+---
+
 ## Frontend Routes
 
 | Route | Access | Description |
 |---|---|---|
 | `/` | Public | Redirects to login |
-| `/login` | Public | Student login |
-| `/register` | Public | Student registration |
-| `/forgot-password` | Public | Student password reset |
+| `/login` | Public | Applicant login (email/password or Google) |
+| `/register` | Public | Applicant registration (with Google pre-fill) |
+| `/forgot-password` | Public | Applicant password reset |
 | `/admin/login` | Public | Admin login |
-| `/change-password` | Student | Forced / manual password change |
-| `/dashboard` | Student | Student dashboard |
-| `/profile` | Student | Student multi-step profile |
-| `/vacancy` | Student | Vacancy listing and apply flow |
-| `/my-applications` | Student | Student application history and admit card access |
-| `/admin/dashboard` | Admin | Admin dashboard with tabs for all admin modules |
-
-### Admin dashboard internal tabs
-
-- Dashboard
-- Create Vacancy
-- Applications
-- All Students
-- Symbol Assignment
-- Admit Cards
+| `/change-password` | Applicant | Forced / manual password change |
+| `/dashboard` | Applicant | Applicant dashboard |
+| `/profile` | Applicant | Applicant multi-step profile |
+| `/vacancy` | Applicant | Vacancy listing and apply flow |
+| `/my-applications` | Applicant | Application history and admit card access |
+| `/admin/dashboard` | Admin | Admin dashboard with all admin modules |
 
 ---
 
@@ -595,12 +463,13 @@ Base path: `/api/auth`
 
 | Method | Route | Protected | Description |
 |---|---|---|---|
-| `POST` | `/register` | No | Student registration |
-| `POST` | `/login` | No | Student login with email or mobile |
-| `POST` | `/forgot-password` | No | Reset student password and email new credentials |
-| `PUT` | `/change-password` | Yes (student) | Change student password |
+| `POST` | `/register` | No | Applicant registration |
+| `POST` | `/login` | No | Applicant login with email or mobile |
+| `POST` | `/google-login` | No | Applicant login with Google credential |
+| `POST` | `/forgot-password` | No | Reset password and email new credentials |
+| `PUT` | `/change-password` | Yes | Change password |
 | `POST` | `/admin/login` | No | Admin login |
-| `POST` | `/admin/register` | No | Admin registration API |
+| `POST` | `/admin/register` | No | Admin registration |
 
 ### User Routes
 
@@ -608,14 +477,14 @@ Base path: `/api/user`
 
 | Method | Route | Protected | Description |
 |---|---|---|---|
-| `GET` | `/profile` | Yes (student) | Get student profile |
-| `PUT` | `/profile/personal` | Yes (student) | Update personal details and upload files |
-| `PUT` | `/profile/address` | Yes (student) | Update address details |
-| `PUT` | `/profile/extra` | Yes (student) | Update extra / quota details |
-| `POST` | `/profile/education` | Yes (student) | Add education record with documents |
-| `PUT` | `/profile/education/:educationId` | Yes (student) | Update education record |
-| `DELETE` | `/profile/education/:educationId` | Yes (student) | Delete education record |
-| `PUT` | `/profile/complete` | Yes (student) | Mark profile as completed |
+| `GET` | `/profile` | Yes | Get applicant profile |
+| `PUT` | `/profile/personal` | Yes | Update personal details and upload files |
+| `PUT` | `/profile/address` | Yes | Update UK address details |
+| `PUT` | `/profile/extra` | Yes | Update equal opportunities details |
+| `POST` | `/profile/education` | Yes | Add education record with documents |
+| `PUT` | `/profile/education/:educationId` | Yes | Update education record |
+| `DELETE` | `/profile/education/:educationId` | Yes | Delete education record |
+| `PUT` | `/profile/complete` | Yes | Mark profile as completed |
 
 ### Vacancy Routes
 
@@ -623,9 +492,9 @@ Base path: `/api/vacancy`
 
 | Method | Route | Protected | Description |
 |---|---|---|---|
-| `GET` | `/` | Yes (student) | Get active vacancies |
-| `POST` | `/apply` | Yes (student) | Apply for a vacancy |
-| `GET` | `/my-applications` | Yes (student) | Get logged-in student's applications |
+| `GET` | `/` | Yes | Get active vacancies |
+| `POST` | `/apply` | Yes | Apply for a vacancy |
+| `GET` | `/my-applications` | Yes | Get logged-in applicant's applications |
 
 ### Admin Routes
 
@@ -634,8 +503,7 @@ Base path: `/api/admin`
 | Method | Route | Protected | Description |
 |---|---|---|---|
 | `GET` | `/dashboard/stats` | Yes (admin) | Dashboard summary counts |
-| `GET` | `/users` | Yes (admin) | Get all students |
-| `GET` | `/vacancy/status` | Yes (admin) | Get vacancy list / vacancy status data |
+| `GET` | `/users` | Yes (admin) | Get all applicants |
 | `POST` | `/vacancy` | Yes (admin) | Create vacancy |
 | `PUT` | `/vacancy/:id` | Yes (admin) | Update vacancy |
 | `DELETE` | `/vacancy/:id` | Yes (admin) | Delete vacancy if unused |
@@ -643,18 +511,10 @@ Base path: `/api/admin`
 | `GET` | `/applications/approved` | Yes (admin) | Get approved applications |
 | `PUT` | `/applications/status` | Yes (admin) | Approve / reject / update status |
 | `POST` | `/applications/auto-assign-symbols` | Yes (admin) | Auto assign symbol numbers |
-| `POST` | `/applications/assign-center` | Yes (admin) | Assign exam center by candidate range |
-| `PUT` | `/applications/symbol` | Yes (admin) | Manually assign symbol number / exam center |
+| `POST` | `/applications/assign-center` | Yes (admin) | Assign exam centre by candidate range |
+| `PUT` | `/applications/symbol` | Yes (admin) | Manually assign symbol number / exam centre |
 | `POST` | `/admit-card/generate` | Yes (admin) | Generate admit card for one application |
 | `POST` | `/admit-card/generate-all` | Yes (admin) | Generate admit cards in bulk |
-
-### Other / Internal Route File Present
-
-There is also a route file:
-
-- `backend/routes/mailTestRoutes.js`
-
-However, it is **not currently mounted in `server.js`**, so it is not active unless added manually.
 
 ---
 
@@ -662,69 +522,39 @@ However, it is **not currently mounted in `server.js`**, so it is not active unl
 
 ### `User`
 
-Stores student identity, contact, address, quota, education, and uploaded document paths.
-
-Key fields include:
+Key fields:
 
 - `masterId`
 - `firstName`, `lastName`
-- `dobAD`
+- `dobAD` — date of birth
 - `gender`
 - `email`, `mobile`
-- `citizenship`, `nid`
+- `niNumber` — National Insurance Number (unique, required)
 - `password`
 - `isFirstLogin`
-- `photo`, `signature`, `citizenshipFront`, `citizenshipBack`
-- `permanentAddress`
+- `photo`, `signature`
+- `idDocumentFront`, `idDocumentBack` — UK identity document (passport, driving licence, etc.)
+- `permanentAddress` — `{ province (Nation), district (Council Area), localBody (City/Town), wardNo (Postcode), tole (Street) }`
 - `temporaryAddress`
 - `sameAddress`
-- `quota`, `caste`, `religion`, `employmentStatus`
+- `quota` — application category
+- `caste` — ethnic group (UK census categories)
+- `religion` — religion or belief
+- `employmentStatus`
 - `education[]`
 - `profileCompleted`
 
 ### `Admin`
 
-Stores admin login credentials and role.
-
-Key fields:
-
-- `email`
-- `password`
-- `role`
+Key fields: `email`, `password`, `role`
 
 ### `Vacancy`
 
-Stores vacancy metadata and fee windows.
-
-Key fields:
-
-- `vacancyName`
-- `companySymbolPrefix`
-- `lastDate`
-- `doubleFeeLastDate`
-- `regularFee`
-- `doubleFee`
-- `isActive`
-- `description`
+Key fields: `vacancyName`, `lastDate`, `doubleFeeLastDate`, `regularFee`, `doubleFee`, `isActive`, `description`
 
 ### `Application`
 
-Represents a student's application for a vacancy.
-
-Key fields:
-
-- `user`
-- `vacancy`
-- `quota`
-- `feePaid`
-- `status`
-- `rejectionReason`
-- `canReapply`
-- `symbolNumber`
-- `examCenter`
-- `admitCardGenerated`
-- `admitCardData`
-- `applicationDate`
+Key fields: `user`, `vacancy`, `quota`, `feePaid`, `status`, `symbolNumber`, `examCenter`, `admitCardGenerated`, `admitCardData`
 
 ---
 
@@ -732,16 +562,20 @@ Key fields:
 
 ### Registration
 
-- Student registration generates:
-  - a 6-digit style master ID
-  - a random 6-character password
-- Credentials are emailed to the student.
+- NI Number replaces the previous Nepal-specific citizenship and NID fields.
+- NI Number format: `AB123456C` (two letters + six digits + one letter A–D).
+- Auto-generated masterId and password are emailed on registration.
 
-### First login handling
+### Google Sign-In
 
-- `isFirstLogin` is `true` initially.
-- After successful password change, it becomes `false`.
-- Forgot password resets it back to `true`.
+- Registration: Google pre-fills name and email only. NI Number, mobile, DOB, and gender must still be entered.
+- Login: Google credential is verified by the backend using `google-auth-library`. The email must already exist in the system.
+
+### UK Address System
+
+- Nation → Council Area / Region → City/Town → Postcode → Street Address.
+- Data covers all four nations: England, Scotland, Wales, Northern Ireland.
+- Scotland includes all 32 council areas.
 
 ### Profile completion gate
 
@@ -751,116 +585,43 @@ Key fields:
 
 - Files are stored in `backend/uploads`.
 - Multer saves files with timestamp-prefixed filenames.
-- Backend upload size limit is **5 MB**.
+- Maximum upload size: **5 MB** per file.
 
 ### Vacancy fee logic
 
-- Before `lastDate`: regular fee is used.
-- After `lastDate`: double fee is used.
-
-### Re-application flow
-
-- If a previous application was rejected, the student can re-apply.
-- Re-applying resets status to `pending` and clears rejection-related fields.
+- Before `lastDate`: regular fee is charged.
+- After `lastDate`: double fee is charged.
 
 ### Symbol number assignment
 
 - Auto assignment runs for **approved** applications only.
-- Applications are sorted alphabetically by candidate name.
-- Symbol numbers are assigned sequentially.
-
-### Exam center assignment
-
-- Admin assigns the same exam center to a candidate range (`startIndex` to `endIndex`) for a vacancy.
-
-### Admit card generation
-
-Admit card generation requires:
-
-- approved application
-- symbol number assigned
-- exam center assigned
-
-Stored admit card data includes:
-
-- exam date
-- exam time
-- rules / instructions
+- Sorted alphabetically by candidate full name.
+- Symbol numbers assigned sequentially.
 
 ### Email notifications
 
-The backend sends emails for:
-
-- registration credentials
-- forgot password / new password
-- application approved
-- application rejected
-
----
-
-## Implementation Notes from Source Review
-
-These points are based on the current source code behavior.
-
-1. **The project zip appears to include installed dependencies.**
-   A clean reinstall is recommended because bundled dependencies can carry permission issues or stale packages.
-
-2. **`mailTestRoutes.js` exists but is not mounted.**
-   The controller / route file is present, but the server does not register it.
-
-3. **`companySymbolPrefix` exists in the `Vacancy` model but is not currently used by symbol assignment logic.**
-   Current symbol assignment is based on vacancy order and alphabetical application sorting.
-
-4. **Frontend expiry behavior is stricter than backend application logic.**
-   The frontend blocks applying after the double-fee deadline, but the backend `applyVacancy` logic does not hard-stop expired submissions after `doubleFeeLastDate`. Add server-side validation if strict enforcement is required.
-
-5. **`frontend/src/utils/nepalData.js` does not currently look Nepal-specific.**
-   The labels and values resemble UK-style regions / divisions. Review this file before production use.
-
-6. **`VITE_API_BASE_URL` is present but not central to the current API helper.**
-   The main API helper uses `VITE_API_URL`.
-
-7. **The repository currently contains `.env` files and uploaded personal documents.**
-   Before sharing or deploying publicly:
-   - rotate credentials
-   - remove personal data
-   - remove test uploads
-   - replace real secrets with environment placeholders
-
-8. **Admin route protection on the frontend is page-driven.**
-   The `/admin/dashboard` screen checks admin auth state itself instead of using the same student protected-route pattern.
-
-9. **Dashboard “paid applications” count is derived from `feePaid > 0`.**
-   It is not strictly tied to `status === 'paid'`.
-
----
-
-## Suggested Improvements
-
-- Add backend validation to reject applications after `doubleFeeLastDate`.
-- Add `.env.example` files for safer onboarding.
-- Remove committed uploads and sensitive environment values from the repository.
-- Add role-based route guards for admin routes on the frontend.
-- Normalize quota option values between frontend and backend.
-- Use `companySymbolPrefix` in symbol generation if prefix-based numbering is required.
-- Add unit / integration tests.
-- Add Docker support for easier local setup.
-- Add production-ready storage for uploads (for example S3 or equivalent) instead of local disk.
-- Add logging and centralized error handling.
+Emails are sent for:
+- Registration credentials
+- Password reset
+- Application approved
+- Application rejected
 
 ---
 
 ## Summary
 
-This repository is a complete full-stack exam roll management system with:
+This is a complete full-stack civil service exam roll management system adapted for the **United Kingdom (Scotland)**, featuring:
 
-- separate student and admin workflows
-- profile and document management
-- vacancy application processing
-- approval / rejection workflow
-- exam symbol and center assignment
-- admit card generation
-- email notification support
-- analytics dashboards on both student and admin sides
-
-It is a strong functional base for a recruitment, exam, or entrance-management platform and is already organized into clear frontend and backend modules.
+- UK-specific identity: National Insurance Number
+- Google Sign-In on registration and login
+- UK address structure (Nation → Council Area → City/Town → Postcode → Street)
+- GOV.UK-inspired interface styling
+- UK equal opportunities monitoring (ethnic group, religion)
+- Separate applicant and admin workflows
+- Profile and identity document management
+- Vacancy application processing
+- Approval / rejection workflow
+- Exam symbol and centre assignment
+- Admit card generation
+- Email notification support
+- Analytics dashboards on both applicant and admin sides

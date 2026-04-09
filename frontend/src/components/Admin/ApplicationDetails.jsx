@@ -81,22 +81,18 @@ const ApplicationDetails = ({ application, onClose, onStatusUpdate }) => {
   </p>
 </div>
               <div>
-                <p className="text-sm text-gray-600">Citizenship</p>
-                <p className="font-medium">{user?.citizenship}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">NID</p>
-                <p className="font-medium">{user?.nid}</p>
+                <p className="text-sm text-gray-600">National Insurance Number</p>
+                <p className="font-medium">{user?.niNumber}</p>
               </div>
               {user?.fatherName && (
                 <div>
-                  <p className="text-sm text-gray-600">Father's Name</p>
+                  <p className="text-sm text-gray-600">Father's / Parent's Name</p>
                   <p className="font-medium">{user?.fatherName}</p>
                 </div>
               )}
               {user?.motherName && (
                 <div>
-                  <p className="text-sm text-gray-600">Mother's Name</p>
+                  <p className="text-sm text-gray-600">Mother's / Parent's Name</p>
                   <p className="font-medium">{user?.motherName}</p>
                 </div>
               )}
@@ -127,22 +123,22 @@ const ApplicationDetails = ({ application, onClose, onStatusUpdate }) => {
                   />
                 </div>
               )}
-              {user?.citizenshipFront && (
+              {user?.idDocumentFront && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-2 font-medium">Citizenship Front</p>
+                  <p className="text-sm text-gray-600 mb-2 font-medium">Identity Document — Front</p>
                   <img
-                    src={`${API_URL}/uploads/${user.citizenshipFront}`}
-                    alt="Citizenship Front"
+                    src={`${API_URL}/uploads/${user.idDocumentFront}`}
+                    alt="Identity Document Front"
                     className="w-full h-40 object-cover border-2 border-gray-300 rounded"
                   />
                 </div>
               )}
-              {user?.citizenshipBack && (
+              {user?.idDocumentBack && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-2 font-medium">Citizenship Back</p>
+                  <p className="text-sm text-gray-600 mb-2 font-medium">Identity Document — Back</p>
                   <img
-                    src={`${API_URL}/uploads/${user.citizenshipBack}`}
-                    alt="Citizenship Back"
+                    src={`${API_URL}/uploads/${user.idDocumentBack}`}
+                    alt="Identity Document Back"
                     className="w-full h-40 object-cover border-2 border-gray-300 rounded"
                   />
                 </div>
