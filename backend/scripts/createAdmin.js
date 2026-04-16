@@ -10,7 +10,7 @@ const createAdmin = async () => {
     console.log('Connected to MongoDB');
 
     const admin = await Admin.create({
-      email: 'admin@examroll.com',
+      email: 'admin@gmail.com',
       password: 'Admin@123'
     });
 

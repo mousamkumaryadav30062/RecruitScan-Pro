@@ -401,13 +401,13 @@ npm run build
 
 ```bash
 cd backend
-node scripts/createAdmin.js
+node scripts/createAdmin.js or npm run create-admin 
 ```
 
 Default admin credentials:
 
 ```text
-Email: admin@examroll.com
+Email: admin@gmail.com
 Password: Admin@123
 ```
 
